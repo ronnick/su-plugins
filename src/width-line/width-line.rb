@@ -1,3 +1,17 @@
+def get_edges(sel)
+  edges = sel.select { |e| e.is_a? Sketchup::Edge }
+end
+
+def is_all_connected(edges)
+  is_connected = false
+  if edges.length < 2
+    is_connected = false
+  else
+    con_edges = edges[0].all_connected.select { |e| edges.include? e }
+    is_connected = con_edges.length == edges.length
+  end
+  return is_connected
+end
 
 def all_one_face(edges)
   is_all_one_face = true
@@ -24,7 +38,11 @@ model = Sketchup.active_model
 ents = model.entities
 sel = model.selection
 
-all_one_face sel
+#all_one_face sel
+sel_edges = get_edges sel
+is_all_connected sel_edges
+
+
 
 =begin
 vect1 = sel[0].end.position - sel[0].start.position
