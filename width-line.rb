@@ -1,9 +1,10 @@
+=begin
 require "sketchup.rb"
 
 unless file_loaded?(__FILE__)
   file_loaded __FILE__
 end
-
+=end
 def get_edges(sel)
   edges = sel.select { |e| e.is_a? Sketchup::Edge }
 end
@@ -97,13 +98,6 @@ end # all_one_face
 
 
 def double_line
-   
-  prompts = ["With(mm):"]
-  defaults = ["50"]
-  results = UI.inputbox prompts, defaults, "Please input double line width"
- 
-  wlen = results[0].to_i
-  wlen = wlen.mm
 
   model = Sketchup.active_model
   ents = model.entities
@@ -116,6 +110,15 @@ def double_line
     vertices_cnt = count_vertex all_vertices
     
     if is_all_connected vertices_cnt
+      
+      prompts = ["With(mm):"]
+      defaults = ["50"]
+      results = UI.inputbox prompts, defaults, "Please input double line width"
+     
+      wlen = results[0].to_i
+      wlen = wlen / 2
+      wlen = wlen.mm
+      
       start_vertex = find_start_vertex vertices_cnt
       sorted_vertices = sort_vertices sel_edges,start_vertex
       
