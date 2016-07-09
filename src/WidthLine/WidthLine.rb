@@ -3,7 +3,6 @@
 module BFZH
 
 class WidthLine
-  # selected edges
   @edges = []
   @all_vertices = []
   @sorted_vertices = []
@@ -53,6 +52,7 @@ class WidthLine
     return (2 == start_vertices_cnt.length)
   end
   
+  # find start vertex
   def find_start_vertex(vertices_cnt)
     start_vertices_cnt = vertices_cnt.select { |k, v| v == 1 }
     return start_vertices_cnt.keys[0]
@@ -128,7 +128,7 @@ class WidthLine
     #all_one_face sel
     get_edges sel
     if @edges.length < 2
-      UI.messagebox "Please select at least 2 connected edges"
+      UI.messagebox "请选择至少2条相连的线段"
       return
     end
     if all_one_face @edges
@@ -138,13 +138,14 @@ class WidthLine
       if is_all_connected @vertices_cnt
         # judge all edges are parallel
         unless @vect_fa
-          UI.messagebox "All edges are connected and parallel"
+          UI.messagebox "所有的线段不能为一条直线"
           return
         end
         # create parameters inputbox
-        prompts = ["With(mm):"]
-        defaults = ["500"]
-        results = UI.inputbox prompts, defaults, "Please input double line width"
+        prompts = ["宽度(mm): ", "删除中心线: ", "是否成组: "]
+        defaults = ["500", "Yes", "Yes"]
+        list = ["", "Yes|No","Yes|No"]
+        results = UI.inputbox prompts, defaults, list, "WidthLine参数设置"
         # convert the parameters string
         wlen = results[0].to_i
         wlen = wlen / 2
@@ -221,7 +222,23 @@ class WidthLine
         
         all_new_vertices = @positive_vertices.concat @negative_vertices.reverse
         # create face using new vertices
-        ents.add_face all_new_vertices     
+        model.start_operation "dline", true
+        face = ents.add_face all_new_vertices
+        
+        # delete the middle line
+        if "Yes" == results[1].to_s
+          ents.erase_entities @edges
+          @edges.clear
+        end
+        
+        if "Yes" == results[2].to_s
+          gp_ents = face.all_connected
+          gp_ents.concat @edges
+          gp = ents.add_group gp_ents
+          gp.name= 'dline'
+          sel.add gp
+        end
+        model.commit_operation
       else
         UI.messagebox "所有的线段未连续连接"
       end # end of if all connected
