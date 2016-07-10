@@ -3,13 +3,6 @@
 module BFZH
 
 class WidthLine
-  @edges = []
-  @all_vertices = []
-  @sorted_vertices = []
-  @positive_vertices = []
-  @negative_vertices = []
-  @vertices_cnt = Hash.new
-  @vect_fa = nil
   
   # constructor
   def initialize
